@@ -19,7 +19,7 @@ setuptools.setup(
     author="Gilou",
     author_email="contact+dev@gilouweb.com",
     version="0.0.1",
-    description="OpenTimelineIO adapter plugin for .drp files created by blackmagic atem iso",
+    description="OpenTimelineIO adapter plugin for .drp files",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/gilou/otio-drp-adapter",
