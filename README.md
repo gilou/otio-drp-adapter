@@ -1,76 +1,11 @@
-# OpenTimelineIO Plugin Template
+# OpenTimelineIO drp adapter plugin
 
-This repository serves as a template for writing new adapters, media linkers, 
-hooks or schemadefs that expand OpenTimelineIO through its plugin system.
-It contains some boiler plate files and folders to help you write plugins that 
-should install correctly through pip should you choose to do so.
-
-Once cloned, you're free to add, rename or remove files and folders as you 
-see fit, but we encourage you to follow the suggested 
-[naming convention](#Suggested-naming-convention) below. 
-That way it's easy for others to spot an OTIO plugin and understand what it does.
-
+This repository aims at storing an adapter for the OpenTimelineIO project allowing to import .drp files from the Blackmagic ATEM ISO. The initial goal is to be able to import them directly in KDEnlive.
 
 ## Licensing
 
-This template repository is licensed under a choice of the 
+This plugin is licensed under the
 [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0.txt)
-or the [MIT License](https://opensource.org/licenses/MIT). If you are cloning 
-this repository, you are welcome to have your code under either of these licenses, 
-or a license that is compatible.
-
-
-## Suggested naming convention
-
-We recommend naming your cloned repository and package name after the 
-following convention:
-
-* Repository and uploaded package name (using hyphens):
-`otio-<dialect>[-<plugintype>]`
-* Python package name (using underscores): `otio_<dialect>_<plugintype>`
-
-
-| Key          | Required | Notes                                                             |
-|:-------------|:--------:|:------------------------------------------------------------------|
-| `dialect`    | True     | The filetype, language, application etc. you're adding support for|
-| `plugintype` | False    | `adapter`, `medialinker`, `hook`, `scemadef` etc.<br>If your plugin contains several of the mentioned components you may omit the<br>plugintype given that the dialect key covers the intention of the plugin.
-
-Examples:
-* `otio-playlist-adapter` (read or write playlist files)
-* `otio-git-hook` (a hook that commits otio file to git after writing)
-* `otio-ffmpeg-medialinker` (link media references using FFmpeg)
-* `otio-videofx-shemadef` (adds some video effects schema)
-* `otio-mxf` (complex plugin to read, write and link MXF files)
-
-
-## Suggested folder structure
-
-```bash
-├── LICENSE
-├── otio_plugin_template
-│   ├── __init__.py
-│   ├── plugin_manifest.json
-│   ├── adapters
-│   │   ├── __init__.py
-│   │   ├── my_adapter.py
-│   ├── hooks
-│   │   ├── __init__.py
-│   │   ├── my_hook.py
-│   ├── operations
-│   │   ├── __init__.py
-│   │   ├── my_media_linker.py
-│   └── schemadefs
-│       ├── __init__.py
-│       ├── my_schemadef.py
-├── README.md
-├── setup.cfg
-├── setup.py
-├── tests
-    └── test_my_plugin.py
-```
-You're free to rename or restructure files and folders above, but make sure the 
-`plugin_manifest.json` filename is kept and that the contents inside it reflect
-your choices so OpenTimelineIO's plugin system loads your plugin properly.
 
 
 ## Testing your plugin during development
@@ -79,9 +14,8 @@ your choices so OpenTimelineIO's plugin system loads your plugin properly.
 pip install -e .
 
 # Test an adapter for instance
-otioconvert -i some_timeline.otio -o some_timeline.ext
+otioconvert -i some_timeline.drp -o some_timeline.ext
 ```
-
 
 ## Unit tests
 
