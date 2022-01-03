@@ -1,6 +1,6 @@
 # Copyright Contributors to the OpenTimelineIO project
 #
-# SPDX-License-Identifier: MIT OR Apache-2.0
+# SPDX-License-Identifier: Apache-2.0
 #
 
 import io
@@ -11,28 +11,24 @@ with io.open("README.md", "r", encoding="utf-8") as f:
 
 
 """
-Make sure to replace all the dummy names, emails etc. with your details and
-package names.
+OpenTimelineIO plugin adapter for .drp files created by the Blackmagic ATEM ISO
 """
 
 setuptools.setup(
-    name="your-plugin-name",
-    author="YOUR NAME",
-    author_email="your.email@domain.com",
+    name="otio-drp-adapter",
+    author="Gilou",
+    author_email="contact+dev@gilouweb.com",
     version="0.0.1",
-    description="Short description of your plugin",
+    description="OpenTimelineIO adapter plugin for .drp files created by blackmagic atem iso",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # Replace url with your repo
-    url="https://github.com/USERNAME/your-repo-name",
+    url="https://github.com/gilou/otio-drp-adapter",
     packages=setuptools.find_packages(),
     entry_points={
-        # Replace otio_plugin_template with your package name
-        "opentimelineio.plugins": "otio_plugin_template = otio_plugin_template"
+        "opentimelineio.plugins": "otio_drp_adapter = otio_drp_adapter"
     },
     package_data={
-        # Replace otio_plugin_template with your package name
-        "otio_plugin_template": [
+        "otio_drp_adapter": [
             "plugin_manifest.json",
         ],
     },
