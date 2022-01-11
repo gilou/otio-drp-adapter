@@ -37,7 +37,9 @@ class DrpTimecode:
     """In case we need to output it"""
 
     def __str__(self):
-        return f"{self.hours}:{self.minutes}:{self.seconds}:{self.frames}"
+        return "{}:{}:{}:{}".format(
+            self.hours, self.minutes, self.seconds, self.frames
+        )
 
     def asolute_nb_frames(self):
         return (
@@ -129,7 +131,7 @@ def read_from_file(filepath):
             # So let's figure out its name and ext ref from our hash
             # and compute its length in frames
             clip = otio.schema.Clip(
-                f'{extrefs[current_source]["name"]}',
+                extrefs[current_source]["name"],
                 media_reference=extrefs[current_source]["ref"],
                 source_range=otio.opentime.TimeRange(
                     otio.opentime.RationalTime(current_tc, rate),

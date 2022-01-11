@@ -7,6 +7,6 @@ DRP_EXAMPLE_PATH = os.path.join(SAMPLE_DATA_DIR, "sample.drp")
 
 def test_adapter():
     timeline = otio.adapters.read_from_file(
-                                        DRP_EXAMPLE_PATH, "otio_drp_adapter"
-                                        )
+        DRP_EXAMPLE_PATH, "otio_drp_adapter"
+    )
     assert isinstance(timeline, otio.schema.Timeline)
