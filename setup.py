@@ -18,7 +18,7 @@ setuptools.setup(
     name="otio-drp-adapter",
     author="Gilou",
     author_email="contact+dev@gilouweb.com",
-    version="0.0.1",
+    version="0.1.0",
     description="OpenTimelineIO adapter plugin for .drp files",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -32,16 +32,8 @@ setuptools.setup(
             "plugin_manifest.json",
         ],
     },
-    install_requires=[
-        "OpenTimelineIO >= 0.12.0"
-    ],
-    extras_require={
-        "dev": [
-            "flake8",
-            "pytest",
-            "twine"
-        ]
-    },
+    install_requires=["OpenTimelineIO >= 0.12.0"],
+    extras_require={"dev": ["flake8", "pytest", "twine"]},
     classifiers=[
         "Development Status :: 4 - Beta",
         "Intended Audience :: Developers",
@@ -56,6 +48,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3.8",
         "Operating System :: OS Independent",
         "License :: OSI Approved :: MIT License",
-        "Natural Language :: English"
-    ]
+        "Natural Language :: English",
+    ],
 )
