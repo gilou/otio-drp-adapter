@@ -15,10 +15,15 @@ Careful: this .drp file format might not be exactly compatible with DaVinci,
 as the Blackmagic ATEM ISO may generate a simplified version, and there
 doesn't seem to be any easy to find reference specifications for those files.
 
+main_mix: Do we want a flat main mix track that has all the clips in it
+(or, source tracks, with gapped clips )
+full_tracks: Should we output source tracks with gaps,
+or with original source all the way, to make multicam editing easier?
+
 """
 
 
-def read_from_file(filepath):
+def read_from_file(filepath, main_mix=False, full_tracks=False):
     # We read the .drp file directly
     with open(filepath) as source:
         # First line contains metadata and the starting settings
@@ -38,8 +43,8 @@ def read_from_file(filepath):
         widths, rates = metadata["videoMode"].split("p")
         rate = int(rates)
         # For now, the timeline is a single track.
-        track = otio.schema.Track(track_name)
-        timeline.tracks.append(track)
+        main_track = otio.schema.Track(track_name)
+
         # If we don't have sources, the .drp file is probably broken.
         if "sources" not in metadata:
             raise Exception("No sources in drp file")
@@ -69,14 +74,32 @@ def read_from_file(filepath):
                 )
                 # add it to the src dict from JSON
                 src["ref"] = ref
+                src_track = otio.schema.Track(src["name"])
+                src["track"] = src_track
             # add our entry to extrefs, with _index_ as the key (it's an int.)
             extrefs[src["_index_"]] = src
 
+        # Let's append the interesting tracks in reverse order
+        for k, src in sorted(
+            extrefs.items(), key=lambda x: x[1]["name"], reverse=True
+        ):
+            if "track" in src:
+                timeline.tracks.append(src["track"])
+                if full_tracks:
+                    sclip = otio.schema.Clip(
+                        src["name"],
+                        media_reference=src["ref"],
+                        source_range=available_range,
+                    )
+                    src["track"].append(sclip)
         # Loosely try to get the scene chosen before the show starts
         try:
             current_source = metadata["mixEffectBlocks"][0]["source"]
         except KeyError:
             current_source = 0
+
+        if main_mix:
+            timeline.tracks.append(main_track)
 
         # Let's loop over the switches in the timeline
         for c in timeline_data:
@@ -85,19 +108,30 @@ def read_from_file(filepath):
                 c["masterTimecode"], rate
             )
             next_clip_frames = next_clip_tc - tc_ref
+            tr = otio.opentime.TimeRange(
+                current_tc,
+                next_clip_frames,
+            )
 
             # So let's figure out its name and ext ref from our hash
             # and compute its length in frames
             clip = otio.schema.Clip(
                 extrefs[current_source]["name"],
                 media_reference=extrefs[current_source]["ref"],
-                source_range=otio.opentime.TimeRange(
-                    current_tc,
-                    next_clip_frames,
-                ),
+                source_range=tr,
             )
+            gap = otio.schema.Gap(source_range=tr)
+
             # Add it to the track
-            track.append(clip)
+            if main_mix:
+                main_track.append(clip)
+            if not full_tracks:
+                for name, source in extrefs.items():
+                    if "track" in source:
+                        if name == current_source:
+                            source["track"].append(clip.clone())
+                        else:
+                            source["track"].append(gap.clone())
             # Prepare for the next round, let's move on at the end
             # of the added clip, and set the sources for the next clip.
             current_tc += next_clip_frames
