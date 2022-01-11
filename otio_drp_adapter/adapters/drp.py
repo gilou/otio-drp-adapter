@@ -17,49 +17,6 @@ doesn't seem to be any easy to find reference specifications for those files.
 
 """
 
-""" Represent .drp master timecode for simpler usage with otio timeranges"""
-
-
-class DrpTimecode:
-    """Simple constructor, taking a timecode as HH:MM:SS:FF
-    and an optional framerate"""
-
-    reference = "00:00:00:00"
-
-    def __init__(self, tc, rate=25):
-        hours, minutes, seconds, frames = tc.split(":")
-        self.hours = int(hours)
-        self.minutes = int(minutes)
-        self.seconds = int(seconds)
-        self.frames = int(frames)
-        self.rate = rate
-
-    """In case we need to output it"""
-
-    def __str__(self):
-        return "{}:{}:{}:{}".format(
-            self.hours, self.minutes, self.seconds, self.frames
-        )
-
-    def asolute_nb_frames(self):
-        return (
-            self.frames
-            + self.rate * self.seconds
-            + self.rate * 60 * self.minutes
-            + self.rate * 3600 * self.hours
-        )
-
-    def nb_frames(self):
-        return (
-            self.asolute_nb_frames()
-            - DrpTimecode(DrpTimecode.reference, self.rate).asolute_nb_frames()
-        )
-
-    """Let's offer tc1 - tc2 = number of frames in between"""
-
-    def __sub__(a, b):
-        return a.nb_frames() - b.nb_frames()
-
 
 def read_from_file(filepath):
     # We read the .drp file directly
@@ -87,17 +44,16 @@ def read_from_file(filepath):
         if "sources" not in metadata:
             raise Exception("No sources in drp file")
 
-        # Start of current clip
-        DrpTimecode.reference = mt
-        # By definition, this should be 0, maybe we could just set it to 0.
-        current_tc = DrpTimecode(mt).nb_frames()
+        tc_ref = otio.opentime.from_timecode(mt, rate)
+        current_tc = otio.opentime.RationalTime(value=0, rate=rate)
         # Let's compute the duration of the full scene based on the last switch
         last_tc = timeline_data[-1]["masterTimecode"]
-        duration = DrpTimecode(last_tc).nb_frames()
+        end_frame = otio.opentime.from_timecode(last_tc, rate)
+        duration = end_frame - tc_ref
         # And make it available for the ext ref
         available_range = otio.opentime.TimeRange(
-            start_time=otio.opentime.RationalTime(current_tc, rate),
-            duration=otio.opentime.RationalTime(duration, rate),
+            start_time=current_tc,
+            duration=duration,
         )
 
         # Let's create an hash with all the indices as the key for later
@@ -125,8 +81,8 @@ def read_from_file(filepath):
         # Let's loop over the switches in the timeline
         for c in timeline_data:
             # End of current clip is there, and it has that many frames
-            next_clip_tc = DrpTimecode(c["masterTimecode"], rate)
-            next_clip_frames = next_clip_tc.nb_frames()
+            next_clip_tc = otio.opentime.from_timecode(c["masterTimecode"], rate)
+            next_clip_frames = next_clip_tc - tc_ref
 
             # So let's figure out its name and ext ref from our hash
             # and compute its length in frames
@@ -134,8 +90,8 @@ def read_from_file(filepath):
                 extrefs[current_source]["name"],
                 media_reference=extrefs[current_source]["ref"],
                 source_range=otio.opentime.TimeRange(
-                    otio.opentime.RationalTime(current_tc, rate),
-                    otio.opentime.RationalTime(next_clip_frames, rate),
+                    current_tc,
+                    next_clip_frames,
                 ),
             )
             # Add it to the track

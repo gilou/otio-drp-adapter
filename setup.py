@@ -18,15 +18,13 @@ setuptools.setup(
     name="otio-drp-adapter",
     author="Gilou",
     author_email="contact+dev@gilouweb.com",
-    version="0.1.0",
+    version="0.1.1",
     description="OpenTimelineIO adapter plugin for .drp files",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/gilou/otio-drp-adapter",
     packages=setuptools.find_packages(),
-    entry_points={
-        "opentimelineio.plugins": "otio_drp_adapter = otio_drp_adapter"
-    },
+    entry_points={"opentimelineio.plugins": "otio_drp_adapter = otio_drp_adapter"},
     package_data={
         "otio_drp_adapter": [
             "plugin_manifest.json",
