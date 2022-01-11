@@ -81,7 +81,9 @@ def read_from_file(filepath):
         # Let's loop over the switches in the timeline
         for c in timeline_data:
             # End of current clip is there, and it has that many frames
-            next_clip_tc = otio.opentime.from_timecode(c["masterTimecode"], rate)
+            next_clip_tc = otio.opentime.from_timecode(
+                c["masterTimecode"], rate
+            )
             next_clip_frames = next_clip_tc - tc_ref
 
             # So let's figure out its name and ext ref from our hash
